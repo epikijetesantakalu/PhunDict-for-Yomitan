@@ -1,4 +1,5 @@
 import { Dictionary, DictionaryIndex, TermEntry } from 'yomichan-dict-builder';
+import { execSync } from 'child_process';
 
 const sourceDictURL = "https://kaeru2193.github.io/Phun-Resources/dict/phun-dict.json";
 
@@ -43,23 +44,29 @@ for (let i = 0; i < dictData.data.length; i++) {
             const detailedDefinition = {
                 type: "structured-content",
                 content: {
-                tag: "div",
-                content: [
-                    { tag: "span", content: dictData.data[i].mean[j].type, data: { partOfSpeech: dictData.data[i].mean[j].type } },
-                    { tag: "span", content: dictData.data[i].mean[j].explanation[k].translate },
-                    { tag: "div", content: dictData.data[i].mean[j].explanation[k].meaning, data: { longExplanation: "true" } }
+                    tag: "div",
+                    content: [
+                        { tag: "span", content: dictData.data[i].mean[j].type, data: { partOfSpeech: dictData.data[i].mean[j].type } },
+                        { tag: "span", content: dictData.data[i].mean[j].explanation[k].translate },
+                        { tag: "div", content: dictData.data[i].mean[j].explanation[k].meaning, data: { longExplanation: "true" } }
                     ]
                 }
             }
             
             const entry = new TermEntry(dictData.data[i].word)
-            .setReading(dictData.data[i].latinPron)
+            .setReading(dictData.data[i].pron.split(" ").join(""))
             .addDetailedDefinition(detailedDefinition)
             .build();
 
             await dictionary.addTerm(entry);
         }
     }
+    //generateAudioFile(dictData.data[i].pron.split(" ").join(""));
+}
+
+function generateAudioFile(pronunciation) {
+    execSync(`espeak-ng -vphn ${pronunciation} -w ../phun-audios/wav/${pronunciation}.wav`);
+    execSync(`ffmpeg -i ../phun-audios/wav/${pronunciation}.wav ../phun-audios/mp3/${pronunciation}.mp3 -y`);
 }
 
 await dictionary.addFile('./styles.css', 'styles.css');
