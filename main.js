@@ -61,7 +61,7 @@ for (let i = 0; i < dictData.data.length; i++) {
             await dictionary.addTerm(entry);
         }
     }
-    //generateAudioFile(dictData.data[i].pron.split(" ").join(""));
+    generateAudioFile(dictData.data[i].pron.split(" ").join(""));
 }
 
 function generateAudioFile(pronunciation) {
