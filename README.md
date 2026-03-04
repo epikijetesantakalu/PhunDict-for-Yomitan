@@ -8,3 +8,5 @@ PhunDict for Yomitanは、[@kaeru2193](https://github.com/kaeru2193)が作成し
 3. yomitanの設定のConfigure installed and enabled dictionaries...からimportを選択し、ダウンロードした辞書ファイルを選択する。
 4. デフォルトだとShiftホバーで使えるよ！（スマホ版は多分長押し）
 5. Configure installed and enabled dictionaries...の画面からたまにアップデートがないか確認しよう！
+## 一緒に使うことをおすすめする辞書
+- [TuoDict For Yomitan](https://github.com/epikijetesantakalu/TuoDict-for-Yomitan/)
