@@ -1,109 +1,63 @@
-import fs from "fs";
-import JSZip from "jszip";
+import { Dictionary, DictionaryIndex, TermEntry } from 'yomichan-dict-builder';
 
-const phunDictURL = "https://kaeru2193.github.io/Phun-Resources/dict/phun-dict.json";
+const sourceDictURL = "https://kaeru2193.github.io/Phun-Resources/dict/phun-dict.json";
 
-async function getPhunDictData() {
+async function getDictData() {
     try {
-    const response = await fetch(phunDictURL);
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error(error.message);
-  }
-}
-
-const phunDictData = await getPhunDictData();
-
-const terms = phunDictData.data.map((entry, i) => [
-    entry.word,
-    entry.latinPron,
-    "",
-    "",
-    100000-entry.num || 0,
-    parseDefinitions(entry.mean),
-    i,
-    ""
-]);
-
-function parseDefinitions(mean) {
-    const result = [];
-
-        for(let i = 0; i < mean.length; i++) {
-        const definitionBlock = {
-            "type": "structured-content",
-            "content": {
-                "tag": "div",
-                "data": { "field": "container" },
-                "content": []
-            }
-        };
-
-        definitionBlock.content.content.push({
-            "tag": "div",
-            "data": { "field": "type" },
-            "content": mean[i].type
-        });
-
-        for (let j = 0; j < mean[i].explanation.length; j++) {
-            const exp = mean[i].explanation[j];
-
-            definitionBlock.content.content.push({
-                "tag": "div",
-                "data": { "field": "translation" },
-                "content": j+1 + ". " + exp.translate
-            });
-
-            if (exp.meaning) {
-                definitionBlock.content.content.push({
-                    "tag": "div",
-                    "data": { "field": "meaning" },
-                    "content": exp.meaning
-                });
-            }
+        const response = await fetch(sourceDictURL);
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
         }
+
+        const result = await response.json();
+        return result;
         
-        result.push(definitionBlock);
+    } catch (error) {
+        console.error(error.message);
     }
-    return result;
 }
 
-const maxFileSize = 10000;
-const zip = new JSZip();
+const dictData = await getDictData();
 
-const metaData = {
-    "title": "PhunDict",
-    "format": 3,
-    "revision": "2026",
-    "author": "kaeru2193",
-    "description": "A dictionary for the Phun language."
+const dictionary = new Dictionary({
+    fileName: "PhunDict.zip"
+});
+
+const index = new DictionaryIndex()
+.setTitle("PhunDict")
+.setRevision(dictData.date)
+.setAuthor(dictData.author)
+.setDescription("かえるさんの雰和辞典をyomitan形式に変換したもの")
+.setAttribution("CC4.0")
+.build();
+
+await dictionary.setIndex(index, "../phun-dictionaries/PhunDict", "index.json");
+
+for (let i = 0; i < dictData.data.length; i++) {
+    for (let j = 0; j < dictData.data[i].mean.length; j++) {
+        for (let k = 0; k < dictData.data[i].mean[j].explanation.length; k++) {
+            const detailedDefinition = {
+                type: "structured-content",
+                content: {
+                tag: "div",
+                content: [
+                    { tag: "span", content: dictData.data[i].mean[j].type, data: { partOfSpeech: dictData.data[i].mean[j].type } },
+                    { tag: "span", content: dictData.data[i].mean[j].explanation[k].translate },
+                    { tag: "div", content: dictData.data[i].mean[j].explanation[k].meaning, data: { longExplanation: "true" } }
+                    ]
+                }
+            }
+            
+            const entry = new TermEntry(dictData.data[i].word)
+            .setReading(dictData.data[i].latinPron)
+            .addDetailedDefinition(detailedDefinition)
+            .build();
+
+            await dictionary.addTerm(entry);
+        }
+    }
 }
 
-const css = `
-[data-sc-field="type"] {
-    font-size: 1.0em;
-}
+await dictionary.addFile('./styles.css', 'styles.css');
 
-[data-sc-field="translation"] {
-    font-size: 1.5em;
-}
-
-[data-sc-field="meaning"] {
-    font-size: 1.0em;
-}`;
-
-for (let i = 0; i < terms.length; i += maxFileSize) {
-  const chunk = terms.slice(i, i + maxFileSize);
-  zip.file(`term_bank_${Math.floor(i / maxFileSize) + 1}.json`, JSON.stringify(chunk));
-}
-
-zip.file("index.json", JSON.stringify(metaData));
-zip.file("styles.css", css);
-
-const buffer = await zip.generateAsync({ type: "nodebuffer" });
-fs.writeFileSync("phun-yomitan.zip", buffer);
-console.log("成功 :3");
+await dictionary.export("../phun-dictionaries/PhunDict");

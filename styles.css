@@ -1,0 +1,16 @@
+[data-sc-part-of-speech] {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--tag-part-of-speech-background-color);
+  color: var(--tag-part-of-speech-foreground-color);
+  font-size: 0.8em;
+  padding: 0 0.375em;
+  margin-right: 0.375em;
+  border-radius: 0.25em;
+}
+
+[data-sc-long-explanation] {
+  margin-top: 4px;
+  font-size: 0.9em;
+  opacity: 0.8;
+}

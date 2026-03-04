@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "fs": "^0.0.1-security",
-    "jszip": "^3.10.1"
-  }
+    "yomichan-dict-builder": "^2.10.0"
+  },
+  "type": "module"
 }
