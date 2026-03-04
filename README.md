@@ -1,6 +1,6 @@
 # PhunDict for Yomitan
 ## PhunDict for Yomitanとは？
-PhunDict for Yomitanは、 @kaeru2193 が作成した[雰和辞典](https://dict.kaeru2193.net/)を、Yomitan形式に変換したものだよ！
+PhunDict for Yomitanは、[@kaeru2193](https://github.com/kaeru2193)が作成した[雰和辞典](https://dict.kaeru2193.net/)を、Yomitan形式に変換したものだよ！
 つまりネットで雰語の文章を読むときにポップアップ辞書が使えるよ！
 ## 使い方
 1. ダウンロードしたことがない場合は[ここ](https://yomitan.wiki/)からyomitanをダウンロードする。
