@@ -1,11 +1,12 @@
-import { Dictionary, DictionaryIndex, TermEntry } from 'yomichan-dict-builder';
+import { Dictionary, DictionaryIndex, KanjiEntry, TermEntry } from 'yomichan-dict-builder';
 import { execSync } from 'child_process';
 
-const sourceDictURL = "https://kaeru2193.github.io/Phun-Resources/dict/phun-dict.json";
+const phunDictURL = "https://kaeru2193.github.io/Phun-Resources/dict/phun-dict.json";
+const charaDictURL = "https://kaeru2193.github.io/Phun-Resources/dict/phun-chara.json";
 
-async function getDictData() {
+async function getDictData(url) {
     try {
-        const response = await fetch(sourceDictURL);
+        const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Error: ${response.status}`);
         }
@@ -18,7 +19,7 @@ async function getDictData() {
     }
 }
 
-const dictData = await getDictData();
+const dictData = await getDictData(phunDictURL);
 
 const dictionary = new Dictionary({
     fileName: "PhunDict.zip"
@@ -26,7 +27,7 @@ const dictionary = new Dictionary({
 
 const index = new DictionaryIndex()
 .setTitle("PhunDict")
-.setRevision(dictData.date)
+.setRevision("1.0.3")
 .setAuthor(dictData.author)
 .setDescription("かえるさんの雰和辞典をyomitan形式に変換したもの")
 .setAttribution("CC BY-NC 4.0")
