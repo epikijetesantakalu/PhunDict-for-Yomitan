@@ -70,15 +70,17 @@ for (let i = 0; i < dictData.data.length; i++) {
                 }
             }
 
+            const pronunciation = (dictData.data[i].mean[j].explanation[k]?.pron ?? dictData.data[i].pron).split(" ").join("");
+
             const entry = new TermEntry(dictData.data[i].word)
-                .setReading(dictData.data[i].pron.split(" ").join(""))
+                .setReading(pronunciation)
                 .addDetailedDefinition(detailedDefinition)
                 .build();
 
             await dictionary.addTerm(entry);
+            generateAudioFile(pronunciation);
         }
     }
-    generateAudioFile(dictData.data[i].pron.split(" ").join(""));
 }
 
 function generateAudioFile(word) {
@@ -97,16 +99,18 @@ function generateAudioFile(word) {
 const charaData = await getDictData(charaDictURL);
 
 for (let i = 0; i < charaData.length; i++) {
-    const chara = new KanjiEntry(charaData[i].chara)
-        .setOnyomi(charaData[i].langs.pn.pron)
-        .addMeaning(charaData[i].langs.pn.mean)
+    for (let j = 0; j < charaData[i].langs.phun.length; j++) {
+        const chara = new KanjiEntry(charaData[i].chara)
+        .setOnyomi(charaData[i].langs.phun[j].pron)
+        .addMeaning(charaData[i].langs.phun[j].mean)
         .setStats({
             "画数": String(charaData[i].strokes),
             "漢字転写": charaData[i].chara
         })
         .build();
 
-    dictionary.addKanji(chara);
+        dictionary.addKanji(chara);
+    }
 }
 
 await dictionary.addFile('./styles.css', 'styles.css');
